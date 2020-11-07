@@ -96,7 +96,7 @@ def find_max_var_direc(x):
     _,direc = find_max_eigen_vec(xx_sum)
     return direc
 
-def shift_grad(grad,hess,theta0):
+def shift(grad,hess,theta0):
     '''
     update the gradients and the hessians when the coordinates of the $\theta$ variable is shifted by $\theta_0$
     '''
@@ -182,7 +182,7 @@ def train_project_bst(params,df,labels,feat_list,obj_func,find_direc_func,honest
         if centered:
             g_split_sum,H_split_sum = np.sum(grad_split,axis=0),np.sum(hess_split,axis=0)
             delta_theta_mean,_ = mbst.find_theta(g_split_sum,H_split_sum)
-            grad_split,hess_split = shift_grad(grad_split,hess_split,delta_theta_mean)
+            grad_split,hess_split = shift(grad_split,hess_split,delta_theta_mean)
         else:
             delta_theta_mean = np.zeros((dim,))
         direc = find_direc_func(grad_split,hess_split,grad_func,mbst,
@@ -204,7 +204,7 @@ def train_project_bst(params,df,labels,feat_list,obj_func,find_direc_func,honest
                 delta_theta_tmp = np.stack([node.pred_value for node in tree],axis=0)
                 delta_theta_mean_tmp = np.mean(delta_theta_tmp,axis=0)
                 delta_theta_tmp = delta_theta_tmp - np.expand_dims(delta_theta_mean_tmp,axis=0)
-                grad_split,hess_split = shift_grad(grad,hess,delta_theta_mean_tmp)
+                grad_split,hess_split = shift(grad,hess,delta_theta_mean_tmp)
                 direc = find_max_var_direc(delta_theta_tmp)
                 grad_split_scalar,hess_split_scalar = project(grad_split,hess_split,direc)
 
